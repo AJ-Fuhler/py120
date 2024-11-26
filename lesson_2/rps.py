@@ -24,19 +24,6 @@ class Player:
             case 'spock':
                 return Spock()
 
-    @staticmethod
-    def join_or(lst, delimiter=', ', final_delimiter='or'):
-        result = ''
-
-        for element in lst[:-2]:
-            result += f'{element}{delimiter}'
-        if len(lst) > 1:
-            result += f'{lst[-2]} {final_delimiter} {lst[-1]}'
-        elif len(lst) == 1:
-            return str(lst[0])
-
-
-        return result
 
     def __str__(self):
         pass
@@ -73,7 +60,7 @@ class Human(Player):
 
 
     def choose(self):
-        print(f'Choose one: {Player.join_or(Player.CHOICES)}')
+        print(f'Choose one: rock, paper, scissors, lizard or spock')
         choice = input().strip().lower()
 
         while choice not in Human.VALID_CHOICES:
