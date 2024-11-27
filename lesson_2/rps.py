@@ -4,7 +4,6 @@ import time
 
 
 class Player:
-    CHOICES = ('rock', 'paper', 'scissors', 'lizard', 'spock')
 
 
     def __init__(self):
@@ -34,7 +33,7 @@ class Computer(Player):
         super().__init__()
 
     def choose(self):
-        choice = random.choice(Player.CHOICES)
+        choice = random.choice(Move.MOVES)
         self.move = self.move_object(choice)
         Move.history.append(f"{self} chose {self.move}.")
 
@@ -60,7 +59,7 @@ class Human(Player):
 
 
     def choose(self):
-        print(f'Choose one: rock, paper, scissors, lizard or spock')
+        print('Choose one: rock, paper, scissors, lizard or spock')
         choice = input().strip().lower()
 
         while choice not in Human.VALID_CHOICES:
@@ -82,8 +81,17 @@ class Human(Player):
         return 'You'
 
 class Move:
+    MOVES = ('rock', 'paper', 'scissors', 'lizard', 'spock')
 
     history = []
+
+    @classmethod
+    def display_history(cls):
+        if Move.history:
+            for idx in range(0, len(Move.history) - 1, 2):
+                print(Move.history[idx])
+                print(Move.history[idx + 1])
+                print()
 
     def __init__(self):
         pass
@@ -182,6 +190,15 @@ class RPSGame:
     def _display_welcome_message(self):
         print('Welcome to Rock Paper Scissors!')
 
+    @staticmethod
+    def get_valid_answer(valid_answers):
+        answer = input().strip().lower()
+        while answer not in valid_answers:
+            print('Please choose a valid option')
+            answer = input().strip().lower()
+
+        return answer
+
 
     @staticmethod
     def display_game_rules():
@@ -267,12 +284,17 @@ class RPSGame:
 
     def _play_again(self):
         print('Play again? (y/n)')
-        answer = input().strip().lower()
-        while answer not in ['y', 'yes', 'n', 'no']:
-            print('Please choose a valid option')
-            answer = input().strip().lower()
+        answer = RPSGame.get_valid_answer(['y', 'yes', 'n', 'no'])
 
         return answer in ['y', 'yes']
+
+    def _see_moves(self):
+        print('\nDo you want to see what moves were made this match? (y/n)')
+        answer = RPSGame.get_valid_answer(['y', 'yes', 'n', 'no'])
+
+        return answer in ['y', 'yes']
+
+
 
 
 
@@ -282,11 +304,13 @@ class RPSGame:
 
 
     def play(self):
+        os.system('clear')
         self._display_welcome_message()
         RPSGame.display_game_rules()
         self._ready_to_start()
         while True:
             self._reset_scores()
+            Move.history.clear()
             while True:
                 os.system('clear')
                 self._display_score()
@@ -300,10 +324,14 @@ class RPSGame:
             self._display_score()
             self._display_winner()
 
+            if self._see_moves():
+                os.system('clear')
+                Move.display_history()
+
             if not self._play_again():
                 break
 
-        Move.history.clear()
+        os.system('clear')
         self._display_goodbye_message()
 
 
