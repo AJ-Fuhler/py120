@@ -118,7 +118,7 @@ class Player(Participant):
         self.money -= 1
 
     def how_much_money(self):
-        return f'You now have ${self.money}!'
+        return f'You have ${self.money}!'
 
     def out_of_money(self):
         return self.money == 0
