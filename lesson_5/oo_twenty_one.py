@@ -329,9 +329,8 @@ class TwentyOneGame:
         result = self.get_result()
         if result.startswith('You busted!'):
             self.player.remove_dollar()
-        elif result.startswith('The dealer busted!'):
-            self.player.add_dollar()
-        elif result.startswith('You had more points!'):
+        elif (result.startswith('The dealer busted!') or
+              result.startswith('You had more points!')):
             self.player.add_dollar()
         elif result.startswith('The dealer had more points!'):
             self.player.remove_dollar()
