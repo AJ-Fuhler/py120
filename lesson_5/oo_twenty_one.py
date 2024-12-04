@@ -145,6 +145,8 @@ class Dealer(Participant):
 class TwentyOneGame:
     MAX_TOTAL = 21
     DEALER_MUST_STAY_SCORE = 17
+    HIGH_ACE_VALUE = 11
+    LOW_ACE_VALUE = 1
     HIT = 'h'
     STAY = 's'
 
@@ -215,6 +217,7 @@ class TwentyOneGame:
                 break
             self.dealer_turn()
             break
+        self.adjust_wallet()
         self.display_result()
 
 
@@ -244,10 +247,11 @@ class TwentyOneGame:
         return total
 
     def handle_ace(self, total, ace_count):
-        total += (11 * ace_count)
+        total += (TwentyOneGame.HIGH_ACE_VALUE * ace_count)
         for _ in range(ace_count):
-            if total > 21:
-                total -= 10
+            if total > TwentyOneGame.MAX_TOTAL:
+                total -= (TwentyOneGame.HIGH_ACE_VALUE -
+                          TwentyOneGame.LOW_ACE_VALUE)
 
         return total
 
@@ -260,7 +264,7 @@ class TwentyOneGame:
             print("That's not a valid option\n")
 
     def is_busted(self, participant):
-        return self.total_value(participant.hand) > 21
+        return self.total_value(participant.hand) > TwentyOneGame.MAX_TOTAL
 
 
 
@@ -304,26 +308,33 @@ class TwentyOneGame:
         dealer_score = self.total_value(self.dealer.hand)
 
         if self.is_busted(self.player):
-            self.player.remove_dollar()
             return (f'You busted! '
                     f'{self.player.how_much_money()}')
 
         if self.is_busted(self.dealer):
-            self.player.add_dollar()
             return (f'The dealer busted! '
                     f'{self.player.how_much_money()}')
 
         if player_score > dealer_score:
-            self.player.add_dollar()
             return (f'You had more points! '
                     f'{self.player.how_much_money()}')
 
         if dealer_score > player_score:
-            self.player.remove_dollar()
             return (f'The dealer had more points! '
                    f'{self.player.how_much_money()}')
 
         return f"You tied! {self.player.how_much_money()}"
+
+    def adjust_wallet(self):
+        result = self.get_result()
+        if result.startswith('You busted!'):
+            self.player.remove_dollar()
+        elif result.startswith('The dealer busted!'):
+            self.player.add_dollar()
+        elif result.startswith('You had more points!'):
+            self.player.add_dollar()
+        elif result.startswith('The dealer had more points!'):
+            self.player.remove_dollar()
 
     def display_quitting_reason(self):
         clear_screen()
